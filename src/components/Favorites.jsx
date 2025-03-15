@@ -1,28 +1,56 @@
-/*
-El componente Favorites muestra la lista de criptomonedas favoritas. 
-Para ello, obtiene la lista de favoritos del localStorage del navegador y 
-muestra la información de las criptomonedas en una lista. 
-Cada elemento de la lista es un enlace a la ruta /coin/:id, 
-donde :id es el identificador de la criptomoneda. 
-Si no hay criptomonedas favoritas, muestra un mensaje indicando que 
-no hay criptomonedas favoritas.
-
-recordamos la estructura del localStorage para guardar:
-localStorage.setItem('clave', 'valor')
-*/
-
-/*
-Si guardamos toda la información de cada criptomoneda en el localStorage, 
-los datos de cada criptomoneda no se actualizarán automáticamente. 
-Para solucionar esto, podemos usar el hook useEffect para hacer una petición 
-a la API de CoinCap cada vez que se renderice el componente Favorites. 
-Podemos filtrar las criptomonedas favoritas de la lista de criptomonedas 
-que nos devuelve la API y mostrar solo las criptomonedas favoritas con la 
-información actualizada.
-*/
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import './Home.css';
 
 function Favorites() {
-    return <h1>Favorites Page</h1>;
-  }
-  
-  export default Favorites;
+    const [favorites, setFavorites] = useState([]);
+    const [cryptos, setCryptos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        setFavorites(savedFavorites);
+
+        const fetchCryptos = async () => {
+            try {
+                const response = await fetch('https://api.coincap.io/v2/assets');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los datos de criptomonedas');
+                }
+                const data = await response.json();
+                const filteredCryptos = data.data.filter(crypto => 
+                    savedFavorites.some(fav => fav.id === crypto.id)
+                );
+                setCryptos(filteredCryptos);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCryptos();
+    }, []);
+
+    if (loading) return <p>Cargando...</p>;
+    if (error) return <p>Error: {error}</p>;
+    if (favorites.length === 0) return <p>No hay criptomonedas favoritas</p>;
+
+    return (
+        <div className='list-container'>
+            <h1>Mis Criptomonedas Favoritas</h1>
+            <ul>
+                {cryptos.map(crypto => (
+                    <li key={crypto.id}>
+                        <Link to={`/coin/${crypto.id}`}>
+                            {crypto.rank}. {crypto.name} ({crypto.symbol}) - ${parseFloat(crypto.priceUsd).toFixed(2)}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+export default Favorites;

@@ -1,0 +1,37 @@
+.footer {
+    background: linear-gradient(135deg, #2c3e50, #34495e); /* Mismo gradiente del header para que se vean iguales */
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    box-shadow: 0px -4px 15px rgba(0, 0, 0, 0.3); /* Sombra superior para profundidad */
+    padding: 15px;
+    position: fixed;          
+    left: 0;        
+    width: 100%;     
+    margin-top: 30px;
+    height: 80px ;
+}
+
+.footer-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.footer-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.footer-link {
+    color: #ffcc00;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+    color: #ffd633;
+}
+
